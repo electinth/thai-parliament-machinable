@@ -1,8 +1,29 @@
-const getJson = (option: Option) => {
+import fetch from 'node-fetch';
+import { ListPage } from './list-page';
+import { DetailPage } from './detail-page';
+import * as https from 'https';
+
+const BASE_URL = 'https://lis.parliament.go.th/index/';
+
+const getJson = async (option: Option, agent: https.Agent = new https.Agent()) => {
+  const firstListPageUrl = constructUrl(option, 0);
+  const firstListPageResponse = await fetch(firstListPageUrl.href, { agent });
+  const firstListPageText = await firstListPageResponse.text();
+
+  const firstListPage = new ListPage(firstListPageText);
+  const links = [firstListPage.getLinks()[36]];
+
+  const motions = await Promise.all(links.map(async link => {
+    const response = await fetch(BASE_URL + link, { agent });
+    const text = await response.text();
+    return new DetailPage(text).getMotion();
+  }));
+
+  console.log(motions);
 };
 
 const constructUrl = (option: Option, page: number): URL => {
-  const url = new URL('https://lis.parliament.go.th/index/search_advance_detail.php');
+  const url = new URL(`${BASE_URL}search_advance_detail.php`);
   
   const allParams = [
     'S_SYSTEM',

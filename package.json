@@ -4,10 +4,12 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "cheerio": "^1.0.0-rc.3"
+    "cheerio": "^1.0.0-rc.3",
+    "node-fetch": "^2.6.0"
   },
   "devDependencies": {
     "@types/cheerio": "^0.22.17",
+    "@types/node-fetch": "^2.5.5",
     "@typescript-eslint/eslint-plugin": "^2.24.0",
     "@typescript-eslint/parser": "^2.24.0",
     "eslint": "^6.8.0",
