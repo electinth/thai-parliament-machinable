@@ -1,0 +1,15 @@
+# Dependency directory
+node_modules
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode
+
+# Ignore built ts files
+dist/**/*
+
+# Ignore result files
+results/**/*
