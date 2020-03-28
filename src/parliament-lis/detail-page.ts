@@ -1,32 +1,27 @@
 import * as cheerio from 'cheerio';
-import { Motion, Status } from './models/motion';
+import { Motion } from './models/motion';
 import { Person } from './models/person';
 import { AdHocCommittee } from './models/ad-hoc-committee';
 
 export class DetailPage {
   $: CheerioStatic
-  voteDateFromListPage: string
-  statusFromListPage: Status
+  motion: Motion
 
-  constructor(body: string, voteDate: string, status: Status) {
+  constructor(body: string, partialMotion: Motion) {
     this.$ = cheerio.load(body);
-    this.voteDateFromListPage = voteDate;
-    this.statusFromListPage = status;
+    this.motion = partialMotion;
   }
 
   getMotion = (): Motion => {
-    const motion = new Motion();
-    motion.name = this.getName();
-    motion.registrationNo = this.getRegistrationNo();
-    motion.proposedDate = this.getProposedDate();
-    motion.votedDate = this.voteDateFromListPage;
-    motion.status = this.statusFromListPage;
-    motion.contentAndPurpose = this.getContentAndPurpose();
-    motion.purposers = this.getPurposers();
-    motion.seconders = this.getSeconders();
-    motion.adHocCommittee = this.getAdHocCommittee();
+    this.motion.name = this.getName();
+    this.motion.registrationNo = this.getRegistrationNo();
+    this.motion.proposedDate = this.getProposedDate();
+    this.motion.contentAndPurpose = this.getContentAndPurpose();
+    this.motion.purposers = this.getPurposers();
+    this.motion.seconders = this.getSeconders();
+    this.motion.adHocCommittee = this.getAdHocCommittee();
 
-    return motion;
+    return this.motion;
   }
 
   getName = (): string => 

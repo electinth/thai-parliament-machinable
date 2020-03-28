@@ -1,4 +1,5 @@
 import * as cheerio from 'cheerio';
+import { Motion, parseStatus } from './models/motion';
 
 export class ListPage {
   $: CheerioStatic
@@ -15,8 +16,24 @@ export class ListPage {
     );
   }
 
-  getLinks = (): string[] => {
-    const trNodes = this.$('td > div > a').toArray();
-    return trNodes.map(node => node.attribs['href']);
+  getPartialMotions = (): Motion[] => {
+    const motionTrNodes = this.$('table.table-condensed > tbody > tr').toArray();
+    const motions = [];
+    for (const trNode of motionTrNodes) {
+      const motion = new Motion();
+      const tdNodes = this.$('td', trNode).toArray();
+      
+      for (let i = 0; i < tdNodes.length; i++) {
+        if (i === 3) {
+          motion.registrationNo = this.$('div', tdNodes[i]).text();
+        } else if (i === 6) {
+          motion.status = parseStatus(this.$('div', tdNodes[i]).text());
+        } else if (i === 7) {
+          motion.detailPageUrl = `${process.env.BASE_URL}${this.$('div > a', tdNodes[i]).attr('href')}`;
+        }
+      }
+      motions.push(motion);
+    }
+    return motions;
   }
 }

@@ -12,10 +12,15 @@ export class Motion {
   purposers: Person[]
   seconders: Person[]
   adHocCommittee: AdHocCommittee
+  detailPageUrl: string
 }
 
-export enum Status {
+export const parseStatus = (text: string): Status => {
+  return Status.Unknown;
+};
 
+export enum Status {
+  Unknown
 }
 
 export class VotedResult {
