@@ -29,7 +29,7 @@ export class ListPage {
         } else if (i === 6) {
           motion.status = parseStatus(this.$('div', tdNodes[i]).text());
         } else if (i === 7) {
-          motion.detailPageUrl = `${process.env.BASE_URL}${this.$('div > a', tdNodes[i]).attr('href')}`;
+          motion.detailPageUrl = this.$('div > a', tdNodes[i]).attr('href');
         }
       }
       motions.push(motion);
