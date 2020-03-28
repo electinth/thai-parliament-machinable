@@ -1,12 +1,14 @@
-import search from './parliament-lis';
+import * as lis from './parliament-lis';
 import * as https from 'https';
 
-const option = new search.Option();
-option.sapaNo = 25;
-option.system = search.System.Motion;
+const option: lis.Option = {
+  sapaNo: 25,
+  system: lis.System.Motion,
+  toPage: 1
+};
 
 const agent = new https.Agent({
   minVersion: 'TLSv1',
 });
 
-search.getJson(option, agent);
+lis.getAll(option, agent);

@@ -1,29 +1,86 @@
 import fetch from 'node-fetch';
 import { ListPage } from './list-page';
 import * as https from 'https';
+import { config } from './config';
+import { DetailPage } from './detail-page';
+import { Motion } from './models/motion';
 
-process.env.BASE_URL = 'https://lis.parliament.go.th/index/';
+const itemPerPage = 50;
 
-const getJson = async (option: Option, agent: https.Agent = new https.Agent()) => {
-  const firstListPageUrl = constructUrl(option, 0);
-  const firstListPageResponse = await fetch(firstListPageUrl.href, { agent });
+export const getAll = async (option: Option, agent: https.Agent = new https.Agent()): Promise<Motion[]> => {
+  const firstListPageUrl = constructUrl(option, option.fromPage || 0);
+  const firstPage = await getListPage(firstListPageUrl, agent);
+  const resultCount = firstPage.getResultCount();
+  console.log(`Item count: ${resultCount}`);
+
+  const promises = [getMotions(firstPage, agent)];
+  
+  const lastPage = getLastPageNo(resultCount, option.toPage);
+  console.log(`Will scrap til page: ${lastPage}`);
+
+  for (let i = (option.fromPage || 0) + 1; i <= lastPage; i++) {
+    promises.push(getMotionsOfListPageNo(i, option, agent));
+  }
+
+  const arraysOfMotions = await Promise.all(promises);
+  const motions: Motion[] = [];
+  for (const each of arraysOfMotions) {
+    motions.push(...each);
+  }
+
+  console.log(`Scrap ${motions.length} motions`);
+  return motions;
+};
+
+const getListPage = async (url: URL, agent: https.Agent): Promise<ListPage> => {
+  const firstListPageResponse = await fetch(url, { agent });
   const firstListPageText = await firstListPageResponse.text();
 
-  const firstListPage = new ListPage(firstListPageText);
-  // const links = [firstListPage.getLinks()[36]];
-  console.log(firstListPage.getPartialMotions());
+  return new ListPage(firstListPageText);
+};
 
-  // const motions = await Promise.all(links.map(async link => {
-  //   const response = await fetch(BASE_URL + link, { agent });
-  //   const text = await response.text();
-  //   return new DetailPage(text).getMotion();
-  // }));
+const getMotionsOfListPageNo = async (pageNumber: number, option: Option, agent: https.Agent): Promise<Motion[]> => {
+  const listUrl = constructUrl(option, pageNumber);
+  const listPage = await getListPage(listUrl, agent);
 
-  // console.log(motions);
+  return getMotions(listPage, agent);
+};
+
+const getMotions = async (listPage: ListPage, agent: https.Agent): Promise<Motion[]> => {
+  const partialMotions = listPage.getPartialMotions();
+  return Promise.all(
+    partialMotions
+      .map((m: Motion) => getDetailPage(m, agent))
+      .map((p: Promise<DetailPage>) => p.then(d => {
+        return d.getMotion();
+      }))
+  );
+};
+
+const getDetailPage = async (partialMotion: Motion, agent: https.Agent): Promise<DetailPage> => {
+  partialMotion.detailPageUrl = `${config.baseUrl}${partialMotion.detailPageUrl}`;
+  const response = await fetch(partialMotion.detailPageUrl, { agent });
+  const text = await response.text();
+
+  return new DetailPage(text, partialMotion);
+};
+
+const getLastPageNo = (resultCount: number, toPage?: number): number => {
+  const possibleLastPage = Math.ceil(resultCount / itemPerPage);
+  let lastPage = possibleLastPage;
+  if (!toPage) {
+    lastPage = 0;
+  } else if (toPage > possibleLastPage) {
+    lastPage = possibleLastPage;
+  } else if (toPage < possibleLastPage) {
+    lastPage = toPage;
+  }
+
+  return lastPage;
 };
 
 const constructUrl = (option: Option, page: number): URL => {
-  const url = new URL(`${process.env.BASE_URL}search_advance_detail.php`);
+  const url = new URL(`${config.baseUrl}search_advance_detail.php`);
   
   const allParams = [
     'S_SYSTEM',
@@ -63,31 +120,26 @@ const constructUrl = (option: Option, page: number): URL => {
   }
 
   if (page != 0) {
-    url.searchParams.set('offset', (page * 50).toString());
+    url.searchParams.set('offset', (page * itemPerPage).toString());
   }
 
   return url;
 };
 
-class Option {
-  system?: System
-  sapaNo?: number
-  title?: string
+export interface Option {
+  system?: System;
+  sapaNo?: number;
+  title?: string;
 
   // BE
-  year?: number
+  year?: number;
 
   // Full party name
-  party?: string
+  party?: string;
+  fromPage?: number;
+  toPage?: number;
 }
 
-enum System {
+export enum System {
   Motion = 8,
 }
-
-export default {
-  getJson,
-  constructUrl,
-  Option,
-  System,
-};
