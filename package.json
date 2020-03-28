@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "bottleneck": "^2.19.5",
     "cheerio": "^1.0.0-rc.3",
     "node-fetch": "^2.6.0"
   },

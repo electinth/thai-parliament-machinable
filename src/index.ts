@@ -4,7 +4,11 @@ import * as https from 'https';
 const option: lis.Option = {
   sapaNo: 25,
   system: lis.System.Motion,
-  toPage: 1
+  toPage: 1,
+  limiter: {
+    maxConcurrent: 1,
+    minTime: 0,
+  }
 };
 
 const agent = new https.Agent({
