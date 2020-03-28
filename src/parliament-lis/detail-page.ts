@@ -28,6 +28,7 @@ export class DetailPage {
     this.$('h3[class=heading]')
       .text()
       .replace('ชื่อญัตติ : ', '')
+      .replace('\n', '')
       .trim();
 
   getRegistrationNo = (): string =>
@@ -48,6 +49,7 @@ export class DetailPage {
     this.$('td:contains("สาระและวัตถุประสงค์ : ")')
       .next('td')
       .text()
+      .replace('\n', '')
       .trim();
   
   getPurposers = (): Person[] => {
