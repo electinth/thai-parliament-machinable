@@ -5,16 +5,15 @@ const itemPerPage = 50;
 
 export const getLastPageNo = (resultCount: number, toPage?: number): number => {
   const possibleLastPage = Math.ceil(resultCount / itemPerPage);
-  let lastPage = possibleLastPage;
   if (!toPage) {
-    lastPage = 0;
-  } else if (toPage > possibleLastPage) {
-    lastPage = possibleLastPage;
-  } else if (toPage < possibleLastPage) {
-    lastPage = toPage;
+    return possibleLastPage;
+  }
+  
+  if (toPage < possibleLastPage) {
+    return toPage;
   }
 
-  return lastPage;
+  return possibleLastPage;
 };
 
 export const constructUrl = (options: Options, page: number): URL => {
