@@ -40,7 +40,7 @@ export const getListPage = async (url: URL, fetcher: Fetcher): Promise<ListPage>
 };
 
 export const getDetailPage = async (partialMotion: Motion, fetcher: Fetcher): Promise<DetailPage> => {
-  partialMotion.detailPageUrl = `${config.baseUrl}${partialMotion.detailPageUrl}`;
+  partialMotion.detailPageUrl = `${config.lisBaseUrl}${partialMotion.detailPageUrl}`;
   const response = await fetcher(partialMotion.detailPageUrl);
   const text = await response.text();
 

@@ -18,7 +18,7 @@ export const getLastPageNo = (resultCount: number, toPage?: number): number => {
 };
 
 export const constructUrl = (options: Options, page: number): URL => {
-  const url = new URL(`${config.baseUrl}search_advance_detail.php`);
+  const url = new URL(`${config.lisBaseUrl}search_advance_detail.php`);
   
   const allParams = [
     'S_SYSTEM',
