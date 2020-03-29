@@ -13,10 +13,10 @@ export const getFetcher = (options: Bottleneck.ConstructorOptions): Fetcher => {
   });
 
   return (url: URL | string): Promise<nodeFetch.Response> => {
-    console.log(`---- Queued ${url}`);
+    console.log(`---- Queued ${url} at ${(new Date()).toISOString()}`);
     return limiter.schedule(() => fetch(url, { agent })
       .then(r => {
-        console.log(`---- Fetched ${url}`);
+        console.log(`---- Fetched ${url} at ${(new Date()).toISOString()}`);
         return r;
       }));
   };
@@ -28,5 +28,5 @@ const getLimitter = (options: Bottleneck.ConstructorOptions): Bottleneck => {
 Limiter concurrent = ${options.maxConcurrent || 'unlimited'}
 Delay time between request = ${options.minTime || 0} ms
 -------------------------------------`);
-  return new Bottleneck(options.limiter);
+  return new Bottleneck(options);
 };
