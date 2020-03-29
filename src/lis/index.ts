@@ -1,29 +1,26 @@
-import fetch from 'node-fetch';
-import * as nodeFetch from 'node-fetch';
-import * as https from 'https';
-import Bottleneck from 'bottleneck';
+
 import { config } from './config';
 import { ListPage } from './list-page';
 import { DetailPage } from './detail-page';
 import { Motion } from './models/motion';
+import { Fetcher } from './../network';
 
 const itemPerPage = 50;
 
-export const getAllMotions = async (option: Option, agent: https.Agent = new https.Agent()): Promise<Motion[]> => {
-  configLimiter(option);
+export const getAllMotions = async (option: Option, fetcher: Fetcher): Promise<Motion[]> => {
   
   const firstListPageUrl = constructUrl(option, option.fromPage || 0);
-  const firstPage = await getListPage(firstListPageUrl, agent);
+  const firstPage = await getListPage(firstListPageUrl, fetcher);
   const resultCount = firstPage.getResultCount();
   console.log(`Item count: ${resultCount}`);
   
   const lastPage = getLastPageNo(resultCount, option.toPage);
   console.log(`Will scrap til page: ${lastPage}`);
   
-  const promises = [getMotions(firstPage, agent)];
+  const promises = [getMotions(firstPage, fetcher)];
 
   for (let i = (option.fromPage || 0) + 1; i <= lastPage; i++) {
-    promises.push(getMotionsOfListPageNo(i, option, agent));
+    promises.push(getMotionsOfListPageNo(i, option, fetcher));
   }
 
   const arraysOfMotions = await Promise.all(promises);
@@ -36,37 +33,37 @@ export const getAllMotions = async (option: Option, agent: https.Agent = new htt
   return motions;
 };
 
-const getListPage = async (url: URL, agent: https.Agent): Promise<ListPage> => {
-  const firstListPageResponse = await fetchUrl(url, agent);
+export const getListPage = async (url: URL, fetcher: Fetcher): Promise<ListPage> => {
+  const firstListPageResponse = await fetcher(url);
   const firstListPageText = await firstListPageResponse.text();
 
   return new ListPage(firstListPageText);
 };
 
-const getMotionsOfListPageNo = async (pageNumber: number, option: Option, agent: https.Agent): Promise<Motion[]> => {
-  const listUrl = constructUrl(option, pageNumber);
-  const listPage = await getListPage(listUrl, agent);
+export const getDetailPage = async (partialMotion: Motion, fetcher: Fetcher): Promise<DetailPage> => {
+  partialMotion.detailPageUrl = `${config.baseUrl}${partialMotion.detailPageUrl}`;
+  const response = await fetcher(partialMotion.detailPageUrl);
+  const text = await response.text();
 
-  return getMotions(listPage, agent);
+  return new DetailPage(text, partialMotion);
 };
 
-const getMotions = async (listPage: ListPage, agent: https.Agent): Promise<Motion[]> => {
+const getMotionsOfListPageNo = async (pageNumber: number, option: Option, fetcher: Fetcher): Promise<Motion[]> => {
+  const listUrl = constructUrl(option, pageNumber);
+  const listPage = await getListPage(listUrl, fetcher);
+
+  return getMotions(listPage, fetcher);
+};
+
+const getMotions = async (listPage: ListPage, fetcher: Fetcher): Promise<Motion[]> => {
   const partialMotions = listPage.getPartialMotions();
   return Promise.all(
     partialMotions
-      .map((m: Motion) => getDetailPage(m, agent))
+      .map((m: Motion) => getDetailPage(m, fetcher))
       .map((p: Promise<DetailPage>) => p.then(d => {
         return d.getMotion();
       }))
   );
-};
-
-const getDetailPage = async (partialMotion: Motion, agent: https.Agent): Promise<DetailPage> => {
-  partialMotion.detailPageUrl = `${config.baseUrl}${partialMotion.detailPageUrl}`;
-  const response = await fetchUrl(partialMotion.detailPageUrl, agent);
-  const text = await response.text();
-
-  return new DetailPage(text, partialMotion);
 };
 
 const getLastPageNo = (resultCount: number, toPage?: number): number => {
@@ -130,27 +127,6 @@ const constructUrl = (option: Option, page: number): URL => {
   return url;
 };
 
-let limiter = new Bottleneck();
-
-const configLimiter = (option: Option): void => {
-  console.log(`
--------------------------------------
-Limiter concurrent = ${option.limiter.maxConcurrent || 'unlimited'}
-Delay time between request = ${option.limiter.minTime || 0} ms
--------------------------------------`);
-
-  limiter = new Bottleneck(option.limiter);
-};
-
-const fetchUrl = (url: URL | string, agent: https.Agent): Promise<nodeFetch.Response> => {
-  console.log(`---- Queued ${url}`);
-  return limiter.schedule(() => fetch(url, { agent })
-    .then(r => {
-      console.log(`---- Fetched ${url}`);
-      return r;
-    }));
-};
-
 export interface Option {
   system?: System;
   sapaNo?: number;
@@ -165,8 +141,6 @@ export interface Option {
   // Paging
   fromPage?: number;
   toPage?: number;
-
-  limiter: Bottleneck.ConstructorOptions;
 }
 
 export enum System {

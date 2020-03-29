@@ -1,6 +1,6 @@
-import * as lis from './lis';
-import * as https from 'https';
 import fs from 'fs';
+import * as lis from './lis';
+import * as network from './network';
 
 const exportMotionToJson = async (): Promise<void> => {
   const option: lis.Option = {
@@ -8,18 +8,11 @@ const exportMotionToJson = async (): Promise<void> => {
     system: lis.System.Motion,
     fromPage: 1,
     toPage: 1,
-    limiter: {
-      maxConcurrent: 1,
-      minTime: 0,
-    }
   };
   
-  const agent = new https.Agent({
-    minVersion: 'TLSv1',
-  });
-  
-  const motions = await lis.getAllMotions(option, agent);
+  const motions = await lis.getAllMotions(option, fetcher);
   return fs.writeFileSync('./results/motion.json', JSON.stringify(motions, null, 4));
 };
 
+const fetcher = network.getFetcher();
 exportMotionToJson();
