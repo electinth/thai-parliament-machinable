@@ -14,7 +14,6 @@ export class DetailPage {
 
   getMotion = (): Motion => {
     this.motion.name = this.getName();
-    this.motion.registrationNo = this.getRegistrationNo();
     this.motion.proposedDate = this.getProposedDate();
     this.motion.votedDate = this.getVotedDate();
     this.motion.contentAndPurpose = this.getContentAndPurpose();
@@ -31,13 +30,6 @@ export class DetailPage {
       .text()
       .replace('ชื่อญัตติ : ', '')
       .replace(/\n/g, '')
-      .trim();
-
-  getRegistrationNo = (): string =>
-    this.$('td:contains("เลขทะเบียนรับ :")')
-      .first()
-      .next('td')
-      .text()
       .trim();
 
   getProposedDate = (): string =>
