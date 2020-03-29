@@ -27,7 +27,8 @@ export class ListPage {
         if (i === 3) {
           motion.registrationNo = this.$('div', tdNodes[i]).text();
         } else if (i === 6) {
-          motion.status = parseStatus(this.$('div', tdNodes[i]).text());
+          const data = this.$(tdNodes[i]).text().trim();
+          motion.status = parseStatus(data);
         } else if (i === 7) {
           motion.detailPageUrl = this.$('div > a', tdNodes[i]).attr('href');
         }

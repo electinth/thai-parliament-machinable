@@ -34,12 +34,12 @@ export enum Status {
 const statusMap: {[ id: string ]: Status } = {
   'อยู่ระหว่างการดำเนินการของเจ้าหน้าที่': Status.Processing,
   'รอบรรจุระเบียบวาระเพื่อพิจารณา': Status.InQueue,
-  'อยู่ระหว่างการพิจารณา': Status.InSession,
+  'อยู่ระหว่างการพิจารณา (สภาผู้แทนราษฎร)': Status.InSession,
   'หนังสือส่งค.ร.ม.เรียบร้อยแล้ว': Status.SentToCabinet,
   'ส่งคณะรัฐมนตรีดำเนินการแล้ว': Status.SentToCabinet,
   'ส่งให้คณะรัฐมนตรี': Status.SentToCabinet,
   'มีการแต่งตั้งคณะกรรมาธิการ': Status.ParliamentAppointedCommittee,
-  'อยู่ระหว่างการพิจารณาของคณะกรรมาธิการ': Status.CommitteeWorking,
+  'อยู่ระหว่างการพิจารณาของคณะกรรมาธิการ (สภาผู้แทนราษฎร)': Status.CommitteeWorking,
   'การดำเนินงานตามข้อสังเกตของคณะกรรมาธิการสภาผู้แทนราษฎร': Status.ParliamentApprovedObservation,
   'ผลการดำเนินงานตามข้อสังเกตของคณะกรรมาธิการ': Status.ParliamentApprovedObservation,
 };
