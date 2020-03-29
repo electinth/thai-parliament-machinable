@@ -13,12 +13,12 @@ export const getAllMotions = async (options: Options, fetcher: Fetcher): Promise
   const resultCount = firstPage.getResultCount();
   console.log(`Item count: ${resultCount}`);
   
-  const lastPage = getLastPageNo(resultCount, options.toPage);
-  console.log(`Will scrap til page: ${lastPage}`);
+  const lastPageNo = getLastPageNo(resultCount, options.toPage);
+  console.log(`Will scrap til page: ${lastPageNo}`);
   
   const promises = [getMotions(firstPage, fetcher)];
 
-  for (let i = (options.fromPage || 0) + 1; i <= lastPage; i++) {
+  for (let i = (options.fromPage || 0) + 1; i <= lastPageNo; i++) {
     promises.push(getMotionsOfListPageNo(i, options, fetcher));
   }
 
