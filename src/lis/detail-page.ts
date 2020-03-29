@@ -1,5 +1,5 @@
 import * as cheerio from 'cheerio';
-import { Motion } from './models/motion';
+import { Motion, VotingResult } from './models/motion';
 import { Person } from './models/person';
 import { AdHocCommittee } from './models/ad-hoc-committee';
 
@@ -20,6 +20,7 @@ export class DetailPage {
     this.motion.contentAndPurpose = this.getContentAndPurpose();
     this.motion.purposers = this.getPurposers();
     this.motion.seconders = this.getSeconders();
+    this.motion.votingResult = this.getVotingResult();
     this.motion.adHocCommittee = this.getAdHocCommittee();
 
     return this.motion;
@@ -80,6 +81,36 @@ export class DetailPage {
 
     return this.getFromPeopleTable(seconderTable);
   }
+
+  getVotingResult = (): VotingResult => {
+    const header = this.$('li:contains("ข้อมูลผลการพิจารณาของสภาผู้แทนราษฎร")');
+    if (header.length === 0) {
+      return null;
+    }
+    
+    const zone = header.parentsUntil('nav').next('table');
+
+    const result = new VotingResult();
+    result.type = this.$('#MOTMAS_CON_CMT_RESULT').text();
+    result.result = this.$('#MOTMAS_RESULT').text();
+    result.count = this.$('td:contains("คะแนนเสียง")', zone)
+      .next('td')
+      .text()
+      .replace(/\s+/g, ' ')
+      .trim();
+    result.memberCount = this.$('td:contains("สมาชิกฯทั้งหมดที่มีอยู่")', zone)
+      .next('td')
+      .text()
+      .replace(/\s+/g, ' ')
+      .trim();
+    result.quorumCount = this.$('td:contains("องค์ประชุม")', zone)
+      .next('td')
+      .text()
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    return result;
+  };
 
   getAdHocCommittee = (): AdHocCommittee => {
     const committee = new AdHocCommittee();

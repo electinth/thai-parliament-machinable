@@ -8,9 +8,9 @@ export class Motion {
   votedDate: string
   status: Status
   contentAndPurpose: string
-  votedResult: VotedResult 
   purposers: Person[]
   seconders: Person[]
+  votingResult: VotingResult 
   adHocCommittee: AdHocCommittee
   detailPageUrl: string
 }
@@ -44,10 +44,10 @@ const statusMap: {[ id: string ]: Status } = {
   'ผลการดำเนินงานตามข้อสังเกตของคณะกรรมาธิการ': Status.ParliamentApprovedObservation,
 };
 
-export class VotedResult {
-
-}
-
-export enum VotedResultType {
-  
+export class VotingResult {
+  type: string;
+  result: string;
+  count: string;
+  memberCount: string;
+  quorumCount: string;
 }
