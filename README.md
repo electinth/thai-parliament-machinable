@@ -7,7 +7,7 @@ Default program will do Motions -> JSON
 
 ## Usage
 
-### Docker w/ Docker Compose
+### Docker
 ```
 ./run
 ```

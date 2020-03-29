@@ -1,1 +1,2 @@
-docker-compose up --build
+docker build -t thai-parliament-machinable:dev .
+docker run --rm thai-parliament-machinable:dev
