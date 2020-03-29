@@ -9,7 +9,7 @@ import { Motion } from './models/motion';
 
 const itemPerPage = 50;
 
-export const getAll = async (option: Option, agent: https.Agent = new https.Agent()): Promise<Motion[]> => {
+export const getAllMotions = async (option: Option, agent: https.Agent = new https.Agent()): Promise<Motion[]> => {
   configLimiter(option);
   
   const firstListPageUrl = constructUrl(option, option.fromPage || 0);
