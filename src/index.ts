@@ -14,7 +14,7 @@ const exportMotionToJson = async (): Promise<void> => {
 
 const limitterOptions = {
   maxConcurrent: 1,
-  minTime: 0,
+  minTime: 500,
 };
 const fetcher = network.getFetcher(limitterOptions);
 exportMotionToJson();
