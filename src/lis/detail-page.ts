@@ -16,6 +16,7 @@ export class DetailPage {
     this.motion.name = this.getName();
     this.motion.registrationNo = this.getRegistrationNo();
     this.motion.proposedDate = this.getProposedDate();
+    this.motion.votedDate = this.getVotedDate();
     this.motion.contentAndPurpose = this.getContentAndPurpose();
     this.motion.purposers = this.getPurposers();
     this.motion.seconders = this.getSeconders();
@@ -43,6 +44,18 @@ export class DetailPage {
       .parent()
       .text()
       .replace('วันที่รับ :', '')
+      .trim();
+  
+  getVotedDate = (): string =>
+    this.$('li:contains("ข้อมูลบรรจุเข้าสู่วาระการประชุม")')
+      .parentsUntil('nav')
+      .next('table')
+      .find('strong:contains("วันที่")')
+      .last()
+      .parent()
+      .text()
+      .trim()
+      .replace('วันที่  :', '')
       .trim();
   
   getContentAndPurpose = (): string =>
