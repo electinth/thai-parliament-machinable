@@ -17,7 +17,7 @@ export const getLastPageNo = (resultCount: number, toPage?: number): number => {
   return lastPage;
 };
 
-export const constructUrl = (option: Option, page: number): URL => {
+export const constructUrl = (options: Options, page: number): URL => {
   const url = new URL(`${config.baseUrl}search_advance_detail.php`);
   
   const allParams = [
@@ -37,24 +37,24 @@ export const constructUrl = (option: Option, page: number): URL => {
   allParams
     .forEach(param => url.searchParams.set(param, ''));
   
-  if (option.system) {
-    url.searchParams.set('S_SYSTEM', option.system.toString());
+  if (options.system) {
+    url.searchParams.set('S_SYSTEM', options.system.toString());
   }
 
-  if (option.sapaNo) {
-    url.searchParams.set('S_SAPA_NO', option.sapaNo.toString());
+  if (options.sapaNo) {
+    url.searchParams.set('S_SAPA_NO', options.sapaNo.toString());
   }
 
-  if (option.title) {
-    url.searchParams.set('S_TITLE', option.title);
+  if (options.title) {
+    url.searchParams.set('S_TITLE', options.title);
   }
 
-  if (option.year) {
-    url.searchParams.set('S_YEAR', option.year.toString());
+  if (options.year) {
+    url.searchParams.set('S_YEAR', options.year.toString());
   }
 
-  if (option.party) {
-    url.searchParams.set('S_PATY', option.party);
+  if (options.party) {
+    url.searchParams.set('S_PATY', options.party);
   }
 
   if (page != 0) {
@@ -64,7 +64,7 @@ export const constructUrl = (option: Option, page: number): URL => {
   return url;
 };
 
-export interface Option {
+export interface Options {
   system?: System;
   sapaNo?: number;
   title?: string;

@@ -5,11 +5,8 @@ import * as nodeFetch from 'node-fetch';
 
 export type Fetcher = (url: URL | string) => Promise<nodeFetch.Response>;
 
-export const getFetcher = (): Fetcher => {
-  const limiter = getLimitter({
-    maxConcurrent: 1,
-    minTime: 0,
-  });
+export const getFetcher = (options: Bottleneck.ConstructorOptions): Fetcher => {
+  const limiter = getLimitter(options);
 
   const agent = new https.Agent({
     minVersion: 'TLSv1',
@@ -25,11 +22,11 @@ export const getFetcher = (): Fetcher => {
   };
 };
 
-const getLimitter = (option: Bottleneck.ConstructorOptions): Bottleneck => {
+const getLimitter = (options: Bottleneck.ConstructorOptions): Bottleneck => {
   console.log(`
 -------------------------------------
-Limiter concurrent = ${option.maxConcurrent || 'unlimited'}
-Delay time between request = ${option.minTime || 0} ms
+Limiter concurrent = ${options.maxConcurrent || 'unlimited'}
+Delay time between request = ${options.minTime || 0} ms
 -------------------------------------`);
-  return new Bottleneck(option.limiter);
+  return new Bottleneck(options.limiter);
 };

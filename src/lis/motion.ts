@@ -1,25 +1,25 @@
 
-import { Option, constructUrl, getLastPageNo } from './index';
+import { Options, constructUrl, getLastPageNo } from './index';
 import { config } from './config';
 import { ListPage } from './list-page';
 import { DetailPage } from './detail-page';
 import { Motion } from './models/motion';
 import { Fetcher } from '../network';
 
-export const getAllMotions = async (option: Option, fetcher: Fetcher): Promise<Motion[]> => {
+export const getAllMotions = async (options: Options, fetcher: Fetcher): Promise<Motion[]> => {
   
-  const firstListPageUrl = constructUrl(option, option.fromPage || 0);
+  const firstListPageUrl = constructUrl(options, options.fromPage || 0);
   const firstPage = await getListPage(firstListPageUrl, fetcher);
   const resultCount = firstPage.getResultCount();
   console.log(`Item count: ${resultCount}`);
   
-  const lastPage = getLastPageNo(resultCount, option.toPage);
+  const lastPage = getLastPageNo(resultCount, options.toPage);
   console.log(`Will scrap til page: ${lastPage}`);
   
   const promises = [getMotions(firstPage, fetcher)];
 
-  for (let i = (option.fromPage || 0) + 1; i <= lastPage; i++) {
-    promises.push(getMotionsOfListPageNo(i, option, fetcher));
+  for (let i = (options.fromPage || 0) + 1; i <= lastPage; i++) {
+    promises.push(getMotionsOfListPageNo(i, options, fetcher));
   }
 
   const arraysOfMotions = await Promise.all(promises);
@@ -47,8 +47,8 @@ export const getDetailPage = async (partialMotion: Motion, fetcher: Fetcher): Pr
   return new DetailPage(text, partialMotion);
 };
 
-const getMotionsOfListPageNo = async (pageNumber: number, option: Option, fetcher: Fetcher): Promise<Motion[]> => {
-  const listUrl = constructUrl(option, pageNumber);
+const getMotionsOfListPageNo = async (pageNumber: number, options: Options, fetcher: Fetcher): Promise<Motion[]> => {
+  const listUrl = constructUrl(options, pageNumber);
   const listPage = await getListPage(listUrl, fetcher);
 
   return getMotions(listPage, fetcher);
