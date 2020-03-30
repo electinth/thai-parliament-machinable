@@ -9,7 +9,7 @@ const exportMotionToJson = async (): Promise<void> => {
   };
   
   const motions = await lis.motion.getAllMotions(options, fetcher);
-  return fs.writeFileSync('./results/motion.json', JSON.stringify(motions, null, 4));
+  return fs.writeFileSync(`${__dirname}/results/motion.json`, JSON.stringify(motions, null, 4));
 };
 
 const limitterOptions = {
